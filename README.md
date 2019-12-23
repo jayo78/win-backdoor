@@ -8,5 +8,7 @@ currently developing
 ## TODO
 - Connect to C2 over HTTPS
 - Encrypt important info (host name, process name, ...)
-- Add stager which uses process injection/hollowing 
-- Research anti-virus evasion and malware polymorphism
+- Add stager/packer which uses process injection/hollowing 
+- Add file grabbing and other functionality that doesn't require creating processes
+- Research anti-virus evasion and malware polymorphism (sandbox detection, ...)
+- Research windows kernel programming and kernel mode malware
