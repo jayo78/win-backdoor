@@ -11,4 +11,4 @@ currently developing
 - Add stager/packer which uses process injection/hollowing 
 - Add file grabbing and other functionality that doesn't require creating processes
 - Research anti-virus evasion and malware polymorphism (sandbox detection, ...)
-- Research windows kernel programming and kernel mode malware
+
