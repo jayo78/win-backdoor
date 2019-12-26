@@ -3,7 +3,7 @@ currently developing
 - As it is now, this repo is a skeleton for a reverse shell.
 - Connects to a control server and spawns a shell on a windows machine
 - Utilizes the win32 library
-- Anti-virus and analysis evasion techniques to be implemented
+- Should be compiled with mingw64 (compilation properties are in the Makefile)
 
 ## TODO
 - Connect to C2 over HTTPS
