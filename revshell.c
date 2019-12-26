@@ -33,7 +33,7 @@ static void beacon()
 	char reply_buffer[1024] = { 0 };
 	int recv_size;
 
-	while (true)
+	while (TRUE)
 	{
 		Sleep(5000);
 
