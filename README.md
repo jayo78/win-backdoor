@@ -6,7 +6,7 @@ currently developing
 - Should be compiled with mingw64 (compilation properties are in the Makefile)
 
 ## TODO
-- Connect to C2 over HTTPS
+- Connect to C2 over HTTP
 - Encrypt important info (host name, process name, ...)
 - Add stager/packer which uses process injection/hollowing 
 - Add file grabbing and other functionality that doesn't require creating processes
