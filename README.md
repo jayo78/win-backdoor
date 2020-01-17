@@ -15,7 +15,7 @@ It will then add the new path to a registry run key, either admin or user depend
 - Run "make" from within the Bot directory to compile the bot (uses mingw64)
 
 ## TODO
-~~- registry key persistance ~~
+- ~~registry key persistance~~
 - upload and execute files 
 - get antivirus products 
 - Add cryptor with decryption stub and anti-virus evasion
