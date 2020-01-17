@@ -7,7 +7,7 @@ netcat to act as the command server (will be adding a listener).
 
 ## Bot execution and modules
 Once the bot is run it will attempt to copy itself to the temp directory (from temp environment variable).
-It will then add the new path to a registry run key, either admin or user depending on priviledges. Finally it will execute from within the temp directory and begin beaconing the command server (C2 properties in Bot/config.h). Once a connection is made, the bot will wait to receive module codes, which determine which module is run through the bot. Currently the only module implemented is spawn_shell, which will create a cmd.exe process in the background and pipe stdin, stdout, stderr to the command server.
+It will then add the new path to a registry run key, either admin or user depending on priviledges. Finally it will execute from within the temp directory and begin beaconing the command server (C2 properties in Bot/config.h). Once a connection is made, the bot will wait to receive module codes that determine which module is run through the bot. Currently the only module implemented is spawn_shell, which will create a cmd.exe process in the background and pipe stdin, stdout, stderr to the command server.
 
 ### Notes:
 - To compile windows executables (.exe) on linux, use mingw64
