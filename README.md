@@ -19,6 +19,6 @@ It will then add the new path to a registry run key, either admin or user depend
 - upload and execute files 
 - get antivirus products 
 - Add cryptor with decryption stub and anti-virus evasion
-- java tcp listener
+- python botnet listener
 
 
