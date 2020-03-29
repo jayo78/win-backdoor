@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <ImageHlp.h> /* need to link imagehlp.lib (-limagehlp for gcc)*/
-#include "main.h"
+#include "cryptmain.h"
 
 static int is_valid_key(BYTE* key);
 static int encrypt_section(PSECTION_INFO section, BYTE* key, char* file_name);
