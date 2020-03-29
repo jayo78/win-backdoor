@@ -11,12 +11,12 @@ int main(int argc, char* argv[])
 	SECTION_INFO			stub_section;	/* type defined in header*/
 	SECTION_INFO			code_section; 
 
-	PIMAGE_NT_HEADERS		pe_header;		/* winapi types (read docs) */
-	PIMAGE_SECTION_HEADER	section;
-	PIMAGE_OPTIONAL_HEADER	opt_header;
+	PIMAGE_NT_HEADERS		pe_header;	/* winapi types (read docs) */
+	PIMAGE_SECTION_HEADER		section;
+	PIMAGE_OPTIONAL_HEADER		opt_header;
 	PLOADED_IMAGE			image;
-	DWORD					image_base_addr;
-	DWORD					nsections;		
+	DWORD				image_base_addr;
+	DWORD				nsections;		
 	 
 	if (argc > 3)
 	{
