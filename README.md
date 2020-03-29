@@ -1,6 +1,6 @@
 currently developing
 
-### UPDATE: started working on a crypter, as of now it only encrypts a section within a PE file. Working on runtime decryption.
+#### UPDATE: started working on a crypter, as of now it only encrypts a section within a PE file. Working on runtime decryption.
 
 ## Description
 This is a Remote Access Trojan tool developed as a fun project to learn about malware and evasion.
