@@ -104,7 +104,7 @@ static int encrypt_section(PSECTION_INFO section, BYTE *key, char *file_name)
 	int k = KEY_SIZE;
 	for (int i = 0; i < num_bytes; i++)
 	{
-		buffer[i] = buffer[i] ^ key[k--] ^ (i*k - i);
+		buffer[i] = buffer[i] ^ key[k--];
 		if (k == 0)
 			k = KEY_SIZE;
 	}
