@@ -1,26 +1,24 @@
-currently developing
-
-#### UPDATE: started working on a crypter, as of now it only encrypts a section within a PE file. Working on runtime decryption.
-
 ## Description
-This is a Remote Access Trojan tool developed as a fun project to learn about malware and evasion.
-To communicate with the bot once executed on the target system, you must use a tool like 
-netcat to act as the command server (will be adding a listener).
+This is a persistent reverse shell that uses windows TCP sockets to communicate with a listener. The listener can be anything that accepts a remote connection, I used netcat to test (nc -lnvp 8080). Persistence is achieved through a registry run key that executes the malware path on a reboot. The purpose of this project was to gain a grasp of simple winAPI calls and sockets in C, as well as explore malware techniques. As of writing this, the executable goes undetected by windows defender and has a virustotal.com score of 3/72. The reason for its low detection rate could be due to the simplicity of the executable which doesn't pack/encrypt itself or use any typical process injection methods.
 
-## Bot execution and modules
-Once the bot is run it will attempt to copy itself to the temp directory (from temp environment variable).
-It will then add the new path to a registry run key, either admin or user depending on priviledges. Finally it will execute from within the temp directory and begin beaconing the command server (C2 properties in Bot/config.h). Once a connection is made, the bot will wait to receive module codes that determine which module is run through the bot. Currently the only module implemented is spawn_shell, which will create a cmd.exe process in the background and pipe stdin, stdout, stderr to the command server.
+#### Execution
+
+1. reverse shell executed
+2. copy self to temp folder
+3. execute instance from temp folder
+4. write registry run key for reboot persistence
+5. continually beacon listener until a connection is made 
+6. wait for module code from listener to start the reverse shell
+7. use CreateProcess() to start cmd.exe and pipe stdin/out/err to the socket
+
+*since the cmd process is wrapped in a loop that accepts module codes from the listener the executable will stay connected even when the shell is exited*
+
+*If the executable loses connection to the listener it will continue to beacon every 5 seconds to re-establish connection which could raise a red flag for Anti-virus*
 
 ### Notes:
-- To compile windows executables (.exe) on linux, use mingw64
-- Bot/Makefile contains compilation flags for a compact executable
-- Run "make" from within the Bot directory to compile the bot (uses mingw64)
 
-## TODO
-- ~~registry key persistance~~
-- upload and execute files 
-- get antivirus products 
-- Add cryptor with decryption stub and anti-virus evasion
-- python botnet listener
+- See Makefile for intended compilation and gcc flags for a compact exe
+  - Need to use a compiler that supports windows runtime (mingw)
+- Change ip and port in main.h 
 
 

