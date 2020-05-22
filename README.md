@@ -11,9 +11,9 @@ This is a persistent reverse shell that uses windows TCP sockets to communicate 
 6. wait for module code from listener to start the reverse shell
 7. use CreateProcess() to start cmd.exe and pipe stdin/out/err to the socket
 
-*since the cmd process is wrapped in a loop that accepts module codes from the listener the executable will stay connected even when the shell is exited*
+*since the cmd process is wrapped in a loop that accepts module codes from the listener the backdoor will stay connected even when the shell is exited*
 
-*If the executable loses connection to the listener it will continue to beacon every 5 seconds to re-establish connection which could raise a red flag for Anti-virus*
+*If the backdoor loses connection to the listener it will continue to beacon every 5 seconds to re-establish connection which could raise a red flag for Anti-virus*
 
 ### Notes:
 
